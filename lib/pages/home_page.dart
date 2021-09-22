@@ -1,17 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:foomato/core/store.dart';
-import 'package:foomato/models/cart.dart';
+import 'package:flutter_catalog/core/store.dart';
+import 'package:flutter_catalog/models/cart.dart';
 import 'dart:convert';
-import 'package:foomato/models/catalog.dart';
-import 'package:foomato/utils/routes.dart';
-import 'package:foomato/widgets/home_widgets/catalog_header.dart';
-import 'package:foomato/widgets/home_widgets/catalog_list.dart';
+import 'package:flutter_catalog/models/catalog.dart';
+import 'package:flutter_catalog/utils/routes.dart';
+import 'package:flutter_catalog/widgets/home_widgets/catalog_header.dart';
+import 'package:flutter_catalog/widgets/home_widgets/catalog_list.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
+  ThemeData theme;
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -31,18 +31,18 @@ class _HomePageState extends State<HomePage> {
 
   loadData() async {
     await Future.delayed(Duration(seconds: 2));
-    final catalogJson =
-        await rootBundle.loadString("assets/files/catalog.json");
+    // final catalogJson =
+    //     await rootBundle.loadString("assets/files/catalog.json");
 
-    // final response = await http.get(Uri.parse(url));
-    // final catalogJson = response.body;
+    final response = await http.get(Uri.parse(url));
+    final catalogJson = response.body;
     final decodedData = jsonDecode(catalogJson);
     var productsData = decodedData["products"];
     CatalogModel.items = List.from(productsData)
         .map<Item>((item) => Item.fromMap(item))
         .toList();
     setState(() {});
-   }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +73,13 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    child: "Change Theme".text.bold.make(),
+                    onPressed: () => Navigator.pushNamed(context, MyRoutes.themeRoute),
+                  ),
+                ),
                 CatalogHeader(),
                 if (CatalogModel.items != null && CatalogModel.items.isNotEmpty)
                   CatalogList().py16().expand()
@@ -81,6 +88,8 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-        ));
+        ),
+
+    );
   }
 }
